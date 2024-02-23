@@ -14,7 +14,6 @@ class Data:
 		self.key_dir = os.path.join(self.current_path,"keys\\")	
 
 	def write_data(self, value):
-
 		file = open(self.data_dir, "a")
 		file.write(value)
 		file.close
@@ -33,7 +32,6 @@ class Data:
 			print("Error: Aplication data does not exist")
 
 		else:
-
 			file = open(path, 'r')
 			value = file.read()
 			return value
@@ -45,26 +43,22 @@ class Data:
 
 		if(os.path.isfile(path)):
 			with open(path, "r") as file:
-
 				for line in file:
 					if field in line:
 						return line.split()[-1]
 	
 	
 	def fetch_field(self, value):
-		
 		path = os.path.join(self.current_path, self.data_dir)	
 
 		if(os.path.isfile(path)):
-
 			with open(path, "r") as file:
 				for line in file:
 					if value in line:
 						return line.strip().split()[0]
 				
 		return None
-
-	
+		
 	def output_file(self):
 		file = open(self.data_dir, 'r')
 
