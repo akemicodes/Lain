@@ -1,8 +1,8 @@
 """
-File:			   data.py
-Project:	   Lain
-Date:			   02/23/24
-Author:		   akemi
+File:			data.py
+Project:	        Lain
+Date:			02/23/24
+Author:		        akemi
 Description:
 """
 import os
