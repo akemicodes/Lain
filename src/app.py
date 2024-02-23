@@ -1,74 +1,80 @@
 """
-File:			data.py
-Project:	        Lain
-Date:			02/23/24
-Author:		        akemi
+File:			app.py
+Project:		Lain
+Date:			2/20/24
+Author:			akemicodes
 Description:
 """
+
+from launcher import Launcher
+from secret import Secret
+from user import User
+from entry import Entry
+from data import Data
 import os
 
-class Data:
-	def __init__(self):
-		self.current_path = os.path.dirname(os.path.dirname(__file__))
-		self.data_dir = os.path.join(self.current_path, "data\data.txt")
-		self.key_dir = os.path.join(self.current_path,"keys\\")	
+def output_menu():
+	print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+	print("1.	Add Entry")
+	print("2.	View Entry")
+	print("3.	Decrypt Entry")
+	print("4.	Exit")
+	print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
 
-	def write_data(self, value):
+def get_input():
+	user_input = int(input("Please enter an option 1-4: "))
+	return user_input
 
-		file = open(self.data_dir, "a")
-		file.write(value)
-		file.close
+# Main entry point of the program
+def main():
+	is_running = True
+	launcher_instance = Launcher() 
+	secret_instance = Secret()
+	data_instance = Data()
+	fields = list()
 
-	def store_key(self, value, key):
-		keyPath = "keys\\" + value + ".txt"
-		path = os.path.join(self.current_path, keyPath)
-		file = open(path, "a")
-		file.write(key + "\n")
-		file.close()
 
-	def fetch_key(self, field):
-		path = self.key_dir + field + ".txt"
+	while(is_running):
+		output_menu()
+		user_in = get_input()
+
+		# Add in insance
+		if(user_in == 1):
+			user_input = input("Please enter the name of the application: ")
+			hash_input = input("Please enter a phrase: ")
+			password_input = input("Please enter your password: ")
+
+			hash = secret_instance.generate_hash(hash_input)
+			secret = secret_instance.generate_password(hash, password_input)
+			entry_instance = Entry(user_input, secret)
+			entry_instance.write_entry()
+			data_instance.store_key(user_input, secret_instance.parse_secret(hash))
 		
-		if(not os.path.isfile(path)):
-			print("Error: Aplication data does not exist")
+		elif(user_in == 2):
+			data_instance.output_file()
 
-		else:
-
-			file = open(path, 'r')
-			value = file.read()
-			return value
-
-		return ""
-
-	def fetch_secret(self, field):
-		path  = os.path.join(self.current_path, self.data_dir)
-
-		if(os.path.isfile(path)):
-			with open(path, "r") as file:
-
-				for line in file:
-					if field in line:
-						return line.split()[-1]
-	
-	
-	def fetch_field(self, value):
-		
-		path = os.path.join(self.current_path, self.data_dir)	
-
-		if(os.path.isfile(path)):
-
-			with open(path, "r") as file:
-				for line in file:
-					if value in line:
-						return line.strip().split()[0]
+		# Fetch your password
+		elif(user_in == 3):
+			field_input = input("Please type the application name: ")
+			
+			current_field = data_instance.fetch_field(field_input) # -> We want to fetch the field
+			if(current_field):
+				field = current_field
+				key = data_instance.fetch_key(field) # -> We want to fetch the key that's created 
+			
+				secret = data_instance.fetch_secret(field)
+				key = key.encode('utf-8')
+				secret = secret.encode('utf-8')
+			
+				un_secret = secret_instance.parse_secret(secret_instance.decrypt_password(key, secret))
+				print("Decrypted password: " + un_secret)
 				
-		return None
-
+			
+			else:
+				print("Application data not found!")	
+		
+		elif(user_in == 4):
+			print("Exiting... goodbye!")
+			is_running = False
 	
-	def output_file(self):
-		file = open(self.data_dir, 'r')
-
-		for line in file:
-			print(line)
-
-		file.close()		
+main()
